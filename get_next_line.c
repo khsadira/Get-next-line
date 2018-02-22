@@ -111,7 +111,7 @@ int		get_next_line(const int fd, char **line)
 {
 	static char		*over = NULL;
 	char			buf[BUFF_SIZE + 1];
-	char			*str;
+//	char			*str;
 	int				rd;
 	int				i;
 	int				size;
@@ -125,7 +125,16 @@ int		get_next_line(const int fd, char **line)
 	}
 	if (*line)
 	{
-		*line = ft_strcpy(*line, over);
+		if ((i = ft_backslashn_chr(over)) != -1)
+		{
+			*line = ft_strsub(over, 0, i);
+			printf("line = %s\nover = %s\n",*line,over);
+			over = ft_strsub(over, i + 1, (BUFF_SIZE - i));
+			return (1);
+			printf("over = %s\n",over);
+		}
+		else
+			*line = ft_strcpy(*line, over);
 	}
 	while ((rd = read(fd, buf, BUFF_SIZE)))
 	{
@@ -137,8 +146,7 @@ int		get_next_line(const int fd, char **line)
 				size += BUFF_SIZE;
 	//		printf("size = %d\n",size);
 		//	printf("%s\n", *line);
-		//	printf("ici : %c\n", (*line)[size - 1]);
-	//		(*line)[size] = '\0';	
+		//	printf("ici : %c\n", (*line)[size - 1]);	
 		//	printf("back slash a i = %d\n",i);
 			size -= i;
 	//		printf("line = %s\nsize = %d | i = %d\nbuf = %s\n",*line,size,i,buf);
@@ -154,7 +162,7 @@ int		get_next_line(const int fd, char **line)
 			else
 				free(over);
 			over = ft_strsub(buf, i + 1, (BUFF_SIZE + 1) - i);
-		//	printf("over = %s\nbuf = %s\n",over,buf);
+	//		printf("over = %s\n\n",over);
 		//	printf("endGNL\n");
 		//	printf("line = %s\n\nover = %s\n",*line,over);
 		//	printf("%s\n",buf);
@@ -181,10 +189,13 @@ int		main(int ac, char **av)
 	//{
 	//	ft_putendl(str);
 	//}
-	while(i < 4){
+	while(i < 3){
+	
 	get_next_line(fd, &str);
+	printf("\n\naffichage gnl\n");
 	//printf("\n\nSALUT\n\n");
 	ft_putendl(str);
+	printf("\n\n");
 	i++;}
 	return (0);
 }
