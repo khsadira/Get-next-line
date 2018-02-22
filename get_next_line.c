@@ -29,7 +29,6 @@ int		ft_backslashn_chr(char *str)
 char	*my_realloc(char *str, int size)
 {
 	char 	*ret;
-	int	len;
 
 //	printf("myrealloc\n");
 	//len = ft_strlen(str);
@@ -81,7 +80,6 @@ char	*ft_strfjoin(char *s1, char *s2)
 
 char	*ft_strfadd(char *s1, char *s2, int i)
 {
-	int	j;
 	int	a;
 	char	*ret;
 	char	c;
@@ -125,19 +123,31 @@ int		get_next_line(const int fd, char **line)
 	}
 	if (*line)
 	{
+		//printf("%s\n",*line);
 		if ((i = ft_backslashn_chr(over)) != -1)
 		{
 			*line = ft_strsub(over, 0, i);
-			printf("line = %s\nover = %s\n",*line,over);
+//			printf("line = %s\nover = %s\n",*line,over);
 			over = ft_strsub(over, i + 1, (BUFF_SIZE - i));
+	//		printf("over = %s\n",over);
+			if (over[0] == '\0')
+			{
+				free(over);
+				return (0);
+			}
+	//		printf("1rd = %d\n",rd);
 			return (1);
-			printf("over = %s\n",over);
+//			printf("over = %s\n",over);
 		}
 		else
+		{
 			*line = ft_strcpy(*line, over);
+	//		printf("slt\n");
+		}
 	}
-	while ((rd = read(fd, buf, BUFF_SIZE)))
+	while ((rd = read(fd, buf, BUFF_SIZE)) > 0)
 	{
+	//	printf("rd = %d\n",rd);
 //		printf("starwhile\n");
 		buf[rd] = '\0';
 		if ((i = ft_backslashn_chr(buf)) != -1)
@@ -175,27 +185,23 @@ int		get_next_line(const int fd, char **line)
 		*line = ft_strfjoin(*line, buf);
 	}
 	//printf("afterwhile\n");
+	//printf("rd2 = %d\n",rd);
 	return (0);
 }
-
 int		main(int ac, char **av)
 {
 	char	*str;
 	int		fd;
-	int i =0;
+	int i =5;
+	ac = 10;
 	str = NULL;
 	fd = open(av[1], O_RDONLY);
-	//while (get_next_line(fd, &str) > 0)
-	//{
-	//	ft_putendl(str);
-	//}
-	while(i < 3){
-	
-	get_next_line(fd, &str);
-	printf("\n\naffichage gnl\n");
-	//printf("\n\nSALUT\n\n");
-	ft_putendl(str);
-	printf("\n\n");
-	i++;}
+	while ((i > 0))
+	{
+		//printf("compteut = %d i = %d\n",cmt,i);
+		//printf("%d\n", (i = get_next_line(fd, &str)));
+		i = get_next_line(fd, &str);
+		ft_putendl(str);
+	}
 	return (0);
 }
