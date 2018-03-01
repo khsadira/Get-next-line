@@ -104,90 +104,88 @@ char	*ft_strfadd(char *s1, char *s2, int i)
 	ret[a + i] = '\0';
 	return (ret);
 }
+/*
+int		ft_new_line(int fd, char **line, char **over)
+{
+	int		size;
+	int		i;
+	int		rd;
+	char		buf[BUFF_SIZE + 1];
+	
+	while ((rd = read(fd, buf, BUFF_SIZE)) > 0)
+	{
+		size += BUFF_SIZE;
+		buf[rd] = '\0';
+		if ((i = ft_backslashn_chr(buf)) != -1)
+		{
+			size -= i;
+			(*line) = my_realloc((*line), size);
+			(*line) = ft_strfadd((*line), buf, i);
+			(*over) = ft_strsub(buf, i + 1, (BUFF_SIZE + 1) - i);
+			if ((rd = read(fd, buf, BUFF_SIZE)) != 0 || ft_backslashn_chr((*over)) != -1)
+			{
+				buf[rd] = '\0';
+				(*over) = my_realloc((*over), BUFF_SIZE + rd + 1);
+				(*over) = ft_strjoin((*over), buf);
+			}
+			else
+				return (0);
+			return (1);
+		}
+		(*line) = my_realloc((*line), size); 
+		(*line) = ft_strfjoin((*line), buf);
+	}
+	return (0);
+}*/
 
 int		get_next_line(const int fd, char **line)
 {
 	static char		*over = NULL;
 	char			buf[BUFF_SIZE + 1];
-//	char			*str;
 	int				rd;
 	int				i;
 	int				size;
 
-
 	size = 0;
 	if (fd == -1)
-	{
-		//printf("fd = -1\n");
 		return (-1);
-	}
-	if (*line)
+	if (over)
 	{
-		//printf("%s\n",*line);
 		if ((i = ft_backslashn_chr(over)) != -1)
 		{
-			*line = ft_strsub(over, 0, i);
-//			printf("line = %s\nover = %s\n",*line,over);
+			(*line) = ft_strsub(over, 0, i);
 			over = ft_strsub(over, i + 1, (BUFF_SIZE - i));
-	//		printf("over = %s\n",over);
 			if (over[0] == '\0')
 			{
 				free(over);
-				return (0);
+				return (1);
 			}
-	//		printf("1rd = %d\n",rd);
 			return (1);
-//			printf("over = %s\n",over);
 		}
 		else
 		{
-			*line = ft_strcpy(*line, over);
-	//		printf("slt\n");
+			(*line) = ft_strcpy((*line), over);
+
 		}
 	}
 	while ((rd = read(fd, buf, BUFF_SIZE)) > 0)
 	{
-	//	printf("rd = %d\n",rd);
-//		printf("starwhile\n");
+		size += BUFF_SIZE;
 		buf[rd] = '\0';
 		if ((i = ft_backslashn_chr(buf)) != -1)
 		{
-			if (size == 0)
-				size += BUFF_SIZE;
-	//		printf("size = %d\n",size);
-		//	printf("%s\n", *line);
-		//	printf("ici : %c\n", (*line)[size - 1]);	
-		//	printf("back slash a i = %d\n",i);
 			size -= i;
-	//		printf("line = %s\nsize = %d | i = %d\nbuf = %s\n",*line,size,i,buf);
-			*line = my_realloc(*line, size); 
-			*line = ft_strfadd(*line, buf, i);
-	//		printf("afterline\n");
-			if (!over)
-			{
-		//		printf("malloc over\n");
-				if (!((over = (char *)malloc(sizeof(char) * (i + 1)))))
-					return (-1);
-			}
-			else
-				free(over);
+			(*line) = my_realloc((*line), size); 
+			(*line) = ft_strfadd((*line), buf, i);
 			over = ft_strsub(buf, i + 1, (BUFF_SIZE + 1) - i);
-	//		printf("over = %s\n\n",over);
-		//	printf("endGNL\n");
-		//	printf("line = %s\n\nover = %s\n",*line,over);
-		//	printf("%s\n",buf);
-		//	printf("\n%s\n%s\n",buf,over);
 			return (1);
 		}
-		size += BUFF_SIZE;
-	//	printf("endwhile\n");
-		*line = my_realloc(*line, size); 
-		*line = ft_strfjoin(*line, buf);
+		(*line) = my_realloc(*line, size); 
+		(*line) = ft_strfjoin(*line, buf);
 	}
-	//printf("afterwhile\n");
-	//printf("rd2 = %d\n",rd);
 	return (0);
 }
+
 int		main(int ac, char **av)
 {
 	char	*str;
@@ -201,7 +199,7 @@ int		main(int ac, char **av)
 		//printf("compteut = %d i = %d\n",cmt,i);
 		//printf("%d\n", (i = get_next_line(fd, &str)));
 		i = get_next_line(fd, &str);
-		ft_putendl(str);
+		printf("i = %d | gnl = %s\n",i , str);
 	}
 	return (0);
 }
