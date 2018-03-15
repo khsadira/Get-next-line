@@ -6,7 +6,7 @@
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/15 12:23:24 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/15 14:02:32 by khsadira         ###   ########.fr       */
+/*   Updated: 2018/03/15 15:40:28 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ static int	ft_read_line(char **line, char **over, int fd, int rd)
 		my_realloc((&*line));
 		ft_strcat((*line), buf);
 	}
+	if (rd == -1)
+		return (-1);
 	(*line) = ft_strdup("");
 	return (0);
 }
