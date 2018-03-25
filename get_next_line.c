@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/15 12:23:24 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/15 15:40:28 by khsadira         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
 static int	ft_backslashn_chr(char *str)
@@ -17,100 +5,101 @@ static int	ft_backslashn_chr(char *str)
 	int	i;
 
 	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\n')
-			return (i);
+	while (str[i] != '\n' && str[i])
 		i++;
+	if (str[i] == '\n')
+	{
+		str[i] = '\0';
+		return (i);
 	}
-	return (-1);
+	else
+		return (-1);
 }
 
-static int	my_realloc(char **str)
+static char	*ft_backslashzero_chr(char *str, int rd)
+{
+	int	i;
+	int	j;
+	char	*tmp;
+	
+	tmp = ft_strnew(BUFF_SIZE);
+	i = 0;
+	j = 0;
+	while (i < rd)
+	{
+		while (str[i] == '\0' && i < rd)
+			i++;
+		tmp[j++] = str[i++];
+	}
+	free(str);
+	return (tmp);
+}
+
+static char	*ft_strfjoin(char *overflow, char *buff)
+{
+	int	overflow_size;
+	int	buff_size;;
+	char	*tmp;
+
+	overflow_size = 0;
+	buff_size = 0;
+	if (overflow)
+		overflow_size = ft_strlen(overflow);
+	if (buff)
+		buff_size = ft_strlen(buff);
+	tmp = (char *)malloc(sizeof(*tmp) * (overflow_size + buff_size + 1));
+	ft_memcpy(tmp, overflow, overflow_size);
+	ft_memcpy(tmp + overflow_size, buff, buff_size);
+	tmp[overflow_size + buff_size] = '\0';
+	free(overflow);
+	ft_bzero(buff, BUFF_SIZE + 1);
+	return (tmp);
+}
+
+static int	ft_check_nl(char **overflow, char **buff, char **line)
 {
 	char	*tmp;
-	char	*new;
+	int	i;
 
-	if (!(*str))
+	*overflow = ft_strfjoin(*overflow, *buff);
+	i = ft_backslashn_chr(*overflow);
+	if (i > -1)
 	{
-		if (!((*str) = ft_strnew(BUFF_SIZE + 1)))
-			return (0);
+		*line = ft_strdup(*overflow);
+		tmp = *overflow;
+		*overflow = ft_strdup(*overflow + i + 1);
+		free(tmp);
 		return (1);
 	}
-	if (!(tmp = ft_strnew(ft_strlen(*str))))
-		return (0);
-	new = *str;
-	ft_strcpy(tmp, *str);
-	free(*str);
-	if (!(*str = ft_strnew(ft_strlen(tmp) + BUFF_SIZE)))
-		return (0);
-	ft_strcpy(*str, tmp);
-	free(tmp);
-	return (1);
-}
-
-static int	ft_check_error(char **over, int fd, char **line)
-{
-	if (fd < 0 || line == NULL)
-		return (-1);
-	if (!(*over))
-	{
-		if (!(*over = ft_strnew(BUFF_SIZE + 1)))
-			return (-1);
-	}
-	return (1);
-}
-
-static int	ft_read_line(char **line, char **over, int fd, int rd)
-{
-	char	buf[BUFF_SIZE + 1];
-	char	*tmp;
-	int		i;
-
-	while ((rd = read(fd, buf, BUFF_SIZE)) > 0)
-	{
-		buf[rd] = '\0';
-		if ((i = ft_backslashn_chr(buf)) != -1)
-		{
-			buf[i] = '\0';
-			my_realloc((&*line));
-			tmp = over[fd];
-			over[fd] = ft_strsub(buf, i + 1, BUFF_SIZE - i);
-			free(tmp);
-			ft_strcat((*line), buf);
-			return (1);
-		}
-		my_realloc((&*line));
-		ft_strcat((*line), buf);
-	}
-	if (rd == -1)
-		return (-1);
-	(*line) = ft_strdup("");
 	return (0);
 }
 
-int			get_next_line(int fd, char **line)
+int			get_next_line(int const fd, char **line)
 {
-	static char	*over[15000];
-	int			i;
-	char		*tmp;
+	static char *overflow[15000];
+	char		*buff;
+	int		i;
+	int		rd;
 
-	if (ft_check_error(&over[fd], fd, line) == -1)
+	buff = ft_strnew(BUFF_SIZE);
+	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, buff, 0)) < 0)
 		return (-1);
-	(*line) = ft_strdup("");
-	if (over[fd][0] != '\0')
+	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		my_realloc((&*line));
-		if ((i = ft_backslashn_chr(over[fd])) != -1)
-		{
-			ft_strncat((*line), over[fd], i);
-			tmp = over[fd];
-			over[fd] = ft_strsub(over[fd], i + 1, BUFF_SIZE - i);
-			free(tmp);
-			(*line)[i] = '\0';
+		buff = ft_backslashzero_chr(buff, rd);
+		i = ft_check_nl(&overflow[fd], &buff, line);
+		free(buff);
+		if (i == 1)
 			return (1);
-		}
-		ft_strcpy((*line), over[fd]);
+		buff = ft_strnew(BUFF_SIZE);
 	}
-	return (ft_read_line(line, over, fd, 0));
+	if ((i = ft_check_nl(&overflow[fd], &buff, line)))
+		return (1);
+	else if (ft_strlen(overflow[fd]) > 0)
+	{
+		*line = ft_strdup(overflow[fd]);
+		ft_strdel(&overflow[fd]);
+		return (1);
+	}
+	return (i);
 }
