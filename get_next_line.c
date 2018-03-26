@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/03/26 11:29:42 by khsadira          #+#    #+#             */
+/*   Updated: 2018/03/26 11:52:48 by khsadira         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 static int	ft_backslashn_chr(char *str)
@@ -12,8 +24,7 @@ static int	ft_backslashn_chr(char *str)
 		str[i] = '\0';
 		return (i);
 	}
-	else
-		return (-1);
+	return (-1);
 }
 
 static char	*ft_backslashzero_chr(char *str, int rd)
