@@ -6,7 +6,7 @@
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/26 11:29:42 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/26 11:52:48 by khsadira         ###   ########.fr       */
+/*   Updated: 2018/03/27 15:32:56 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ static int	ft_backslashn_chr(char *str)
 
 static char	*ft_backslashzero_chr(char *str, int rd)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 	char	*tmp;
-	
+
 	tmp = ft_strnew(BUFF_SIZE);
 	i = 0;
 	j = 0;
@@ -48,8 +48,8 @@ static char	*ft_backslashzero_chr(char *str, int rd)
 
 static char	*ft_strfjoin(char *overflow, char *buff)
 {
-	int	overflow_size;
-	int	buff_size;;
+	int		overflow_size;
+	int		buff_size;
 	char	*tmp;
 
 	overflow_size = 0;
@@ -70,7 +70,7 @@ static char	*ft_strfjoin(char *overflow, char *buff)
 static int	ft_check_nl(char **overflow, char **buff, char **line)
 {
 	char	*tmp;
-	int	i;
+	int		i;
 
 	*overflow = ft_strfjoin(*overflow, *buff);
 	i = ft_backslashn_chr(*overflow);
@@ -89,22 +89,21 @@ int			get_next_line(int const fd, char **line)
 {
 	static char *overflow[15000];
 	char		*buff;
-	int		i;
-	int		rd;
+	int			tab[2];
 
 	buff = ft_strnew(BUFF_SIZE);
-	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, buff, 0)) < 0)
+	if (!line || BUFF_SIZE <= 0 || fd < 0 || (tab[1] = read(fd, buff, 0)) < 0)
 		return (-1);
-	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
+	while ((tab[1] = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		buff = ft_backslashzero_chr(buff, rd);
-		i = ft_check_nl(&overflow[fd], &buff, line);
+		buff = ft_backslashzero_chr(buff, tab[1]);
+		tab[0] = ft_check_nl(&overflow[fd], &buff, line);
 		free(buff);
-		if (i == 1)
+		if (tab[0] == 1)
 			return (1);
 		buff = ft_strnew(BUFF_SIZE);
 	}
-	if ((i = ft_check_nl(&overflow[fd], &buff, line)))
+	if ((tab[0] = ft_check_nl(&overflow[fd], &buff, line)))
 		return (1);
 	else if (ft_strlen(overflow[fd]) > 0)
 	{
@@ -112,5 +111,5 @@ int			get_next_line(int const fd, char **line)
 		ft_strdel(&overflow[fd]);
 		return (1);
 	}
-	return (i);
+	return (0);
 }
