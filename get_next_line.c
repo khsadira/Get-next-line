@@ -6,7 +6,7 @@
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/26 11:29:42 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/27 15:32:56 by khsadira         ###   ########.fr       */
+/*   Updated: 2018/03/27 15:48:25 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,7 @@ static int	ft_check_nl(char **overflow, char **buff, char **line)
 	int		i;
 
 	*overflow = ft_strfjoin(*overflow, *buff);
-	i = ft_backslashn_chr(*overflow);
-	if (i > -1)
+	if ((i = ft_backslashn_chr(*overflow)) > -1)
 	{
 		*line = ft_strdup(*overflow);
 		tmp = *overflow;
