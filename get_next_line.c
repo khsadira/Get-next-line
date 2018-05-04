@@ -6,7 +6,7 @@
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/26 11:29:42 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/27 15:48:25 by khsadira         ###   ########.fr       */
+/*   Updated: 2018/05/04 11:52:17 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,6 @@ static int	ft_backslashn_chr(char *str)
 		return (i);
 	}
 	return (-1);
-}
-
-static char	*ft_backslashzero_chr(char *str, int rd)
-{
-	int		i;
-	int		j;
-	char	*tmp;
-
-	tmp = ft_strnew(BUFF_SIZE);
-	i = 0;
-	j = 0;
-	while (i < rd)
-	{
-		while (str[i] == '\0' && i < rd)
-			i++;
-		tmp[j++] = str[i++];
-	}
-	free(str);
-	return (tmp);
 }
 
 static char	*ft_strfjoin(char *overflow, char *buff)
@@ -88,21 +69,21 @@ int			get_next_line(int const fd, char **line)
 {
 	static char *overflow[15000];
 	char		*buff;
-	int			tab[2];
+	int			nl;
+	int			rd;
 
 	buff = ft_strnew(BUFF_SIZE);
-	if (!line || BUFF_SIZE <= 0 || fd < 0 || (tab[1] = read(fd, buff, 0)) < 0)
+	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, buff, 0)) < 0)
 		return (-1);
-	while ((tab[1] = read(fd, buff, BUFF_SIZE)) > 0)
+	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		buff = ft_backslashzero_chr(buff, tab[1]);
-		tab[0] = ft_check_nl(&overflow[fd], &buff, line);
+		nl = ft_check_nl(&overflow[fd], &buff, line);
 		free(buff);
-		if (tab[0] == 1)
+		if (nl == 1)
 			return (1);
 		buff = ft_strnew(BUFF_SIZE);
 	}
-	if ((tab[0] = ft_check_nl(&overflow[fd], &buff, line)))
+	if ((nl = ft_check_nl(&overflow[fd], &buff, line)))
 		return (1);
 	else if (ft_strlen(overflow[fd]) > 0)
 	{
