@@ -6,7 +6,7 @@
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/26 11:29:42 by khsadira          #+#    #+#             */
-/*   Updated: 2018/05/04 11:52:17 by khsadira         ###   ########.fr       */
+/*   Updated: 2018/05/07 15:03:32 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ static char	*ft_strfjoin(char *overflow, char *buff)
 	ft_memcpy(tmp + overflow_size, buff, buff_size);
 	tmp[overflow_size + buff_size] = '\0';
 	free(overflow);
-	ft_bzero(buff, BUFF_SIZE + 1);
 	return (tmp);
 }
 
@@ -54,6 +53,7 @@ static int	ft_check_nl(char **overflow, char **buff, char **line)
 	int		i;
 
 	*overflow = ft_strfjoin(*overflow, *buff);
+	ft_bzero(*buff, BUFF_SIZE + 1);
 	if ((i = ft_backslashn_chr(*overflow)) > -1)
 	{
 		*line = ft_strdup(*overflow);
@@ -63,6 +63,14 @@ static int	ft_check_nl(char **overflow, char **buff, char **line)
 		return (1);
 	}
 	return (0);
+}
+
+int			ft_last_gnl(char **overflow, char **buff, char **line)
+{
+	free(*buff);
+	*line = ft_strdup(*overflow);
+	ft_strdel(&(*overflow));
+	return (1);
 }
 
 int			get_next_line(int const fd, char **line)
@@ -84,12 +92,12 @@ int			get_next_line(int const fd, char **line)
 		buff = ft_strnew(BUFF_SIZE);
 	}
 	if ((nl = ft_check_nl(&overflow[fd], &buff, line)))
-		return (1);
-	else if (ft_strlen(overflow[fd]) > 0)
 	{
-		*line = ft_strdup(overflow[fd]);
-		ft_strdel(&overflow[fd]);
+		free(buff);
 		return (1);
 	}
+	else if (ft_strlen(overflow[fd]) > 0)
+		return (ft_end_gnl(&overflow[fd], &buff, line));
+	free(buff);
 	return (0);
 }
