@@ -1,25 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/26 11:30:08 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/26 11:30:12 by khsadira         ###   ########.fr       */
+/*   Created: 2017/11/13 10:44:27 by khsadira          #+#    #+#             */
+/*   Updated: 2017/12/01 12:54:23 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "libft.h"
 
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <fcntl.h>
-# include "libft/libft.h"
-# define BUFF_SIZE 100
+int	ft_atoi(const char *str)
+{
+	int	i;
+	int	neg;
+	int	nbr;
 
-int		get_next_line(const int fd, char **line);
-
-#endif
+	i = 0;
+	neg = 0;
+	nbr = 0;
+	while (ft_isspace(str[i]))
+		i++;
+	if (str[i] == '-')
+		neg = 1;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	while (ft_isnum(str[i]))
+	{
+		nbr *= 10;
+		nbr += ((int)str[i] - 48);
+		i++;
+	}
+	if (neg == 1)
+		return (-nbr);
+	else
+		return (nbr);
+}

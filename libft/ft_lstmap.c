@@ -1,25 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_lstmap.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: khsadira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/26 11:30:08 by khsadira          #+#    #+#             */
-/*   Updated: 2018/03/26 11:30:12 by khsadira         ###   ########.fr       */
+/*   Created: 2017/11/30 12:08:24 by khsadira          #+#    #+#             */
+/*   Updated: 2017/11/30 12:08:36 by khsadira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "libft.h"
 
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <fcntl.h>
-# include "libft/libft.h"
-# define BUFF_SIZE 100
+t_list	*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem))
+{
+	t_list	*tmp;
+	t_list	*new;
+	t_list	*element;
 
-int		get_next_line(const int fd, char **line);
-
-#endif
+	new = NULL;
+	while (lst)
+	{
+		tmp = f(lst);
+		if (!new)
+		{
+			new = tmp;
+			element = new;
+			new->next = NULL;
+		}
+		else
+		{
+			new->next = tmp;
+			tmp->next = NULL;
+			new = new->next;
+		}
+		lst = lst->next;
+	}
+	return (element);
+}
