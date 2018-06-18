@@ -57,7 +57,6 @@ static int	ft_check_nl(char **overflow, char **buff, char **line)
 	int		i;
 
 	*overflow = ft_strfjoin(*overflow, *buff);
-	ft_bzero(*buff, BUFF_SIZE + 1);
 	if ((i = ft_backslashn_chr(*overflow)) > -1)
 	{
 		*line = ft_strdup(*overflow);
