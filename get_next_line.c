@@ -17,6 +17,8 @@ static int	ft_backslashn_chr(char *str)
 	int	i;
 
 	i = 0;
+	if (!str)
+		return (-1);
 	while (str[i] != '\n' && str[i])
 		i++;
 	if (str[i] == '\n')
@@ -39,7 +41,9 @@ static char	*ft_strfjoin(char *overflow, char *buff)
 		overflow_size = ft_strlen(overflow);
 	if (buff)
 		buff_size = ft_strlen(buff);
-	tmp = (char *)malloc(sizeof(*tmp) * (overflow_size + buff_size + 1));
+	if (!(tmp = (char *)malloc(sizeof(*tmp) *
+		(overflow_size + buff_size + 1))))
+		return (NULL);
 	ft_memcpy(tmp, overflow, overflow_size);
 	ft_memcpy(tmp + overflow_size, buff, buff_size);
 	tmp[overflow_size + buff_size] = '\0';
@@ -80,9 +84,9 @@ int			get_next_line(int const fd, char **line)
 	int			nl;
 	int			rd;
 
-	buff = ft_strnew(BUFF_SIZE);
-	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, buff, 0)) < 0)
+	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, (char *)0, 0)) < 0)
 		return (-1);
+	buff = ft_strnew(BUFF_SIZE);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
 		nl = ft_check_nl(&overflow[fd], &buff, line);
@@ -97,7 +101,7 @@ int			get_next_line(int const fd, char **line)
 		return (1);
 	}
 	else if (ft_strlen(overflow[fd]) > 0)
-		return (ft_end_gnl(&overflow[fd], &buff, line));
+		return (ft_last_gnl(&overflow[fd], &buff, line));
 	free(buff);
 	return (0);
 }
