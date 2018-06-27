@@ -12,95 +12,75 @@
 
 #include "get_next_line.h"
 
-static int	ft_backslashn_chr(char *str)
+char	*ft_strfjoin(char **over, char *buff)
 {
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (-1);
-	while (str[i] != '\n' && str[i])
-		i++;
-	if (str[i] == '\n')
-	{
-		str[i] = '\0';
-		return (i);
-	}
-	return (-1);
-}
-
-static char	*ft_strfjoin(char *overflow, char *buff)
-{
-	int		overflow_size;
-	int		buff_size;
+	int		over_s;
+	int		buff_s;
 	char	*tmp;
 
-	overflow_size = 0;
-	buff_size = 0;
-	if (overflow)
-		overflow_size = ft_strlen(overflow);
+	over_s = 0;
+	buff_s = 0;
+	if (*over)
+		over_s = ft_strlen(*over);
 	if (buff)
-		buff_size = ft_strlen(buff);
-	if (!(tmp = (char *)malloc(sizeof(*tmp) *
-		(overflow_size + buff_size + 1))))
+		buff_s = ft_strlen(buff);
+	if (!(tmp = (char*)malloc(sizeof(char) * (buff_s + over_s + 1))))
 		return (NULL);
-	ft_memcpy(tmp, overflow, overflow_size);
-	ft_memcpy(tmp + overflow_size, buff, buff_size);
-	tmp[overflow_size + buff_size] = '\0';
-	free(overflow);
+	ft_memcpy(tmp, *over, over_s);
+	ft_memcpy(tmp + over_s, buff, buff_s);
+	tmp[over_s + buff_s] = '\0';
+	free(*over);
 	return (tmp);
 }
 
-static int	ft_check_nl(char **overflow, char **buff, char **line)
+int		fill_line(char **over, char **line)
 {
-	char	*tmp;
 	int		i;
+	char	*bn;
+	char	*tmp;
 
-	*overflow = ft_strfjoin(*overflow, *buff);
-	if ((i = ft_backslashn_chr(*overflow)) > -1)
+	if (*over)
 	{
-		*line = ft_strdup(*overflow);
-		tmp = *overflow;
-		*overflow = ft_strdup(*overflow + i + 1);
-		free(tmp);
-		return (1);
+		i = 0;
+		if ((bn = ft_strchr(*over, '\n')) != 0)
+		{
+			while ((*over)[i] != '\n')
+				i++;
+			*line = ft_strsub(*over, 0, i);
+			tmp = *over;
+			*over = ft_strsub(*over, i + 1, ft_strlen(*over) - i);
+			free(tmp);
+			return (1);
+		}
 	}
 	return (0);
 }
 
-int			ft_last_gnl(char **overflow, char **buff, char **line)
+int		get_next_line(const int fd, char **line)
 {
-	free(*buff);
-	*line = ft_strdup(*overflow);
-	ft_strdel(&(*overflow));
-	return (1);
-}
-
-int			get_next_line(int const fd, char **line)
-{
-	static char *overflow[15000];
-	char		*buff;
-	int			nl;
+	static char	*over[15000];
+	char		buff[BUFF_SIZE + 1];
 	int			rd;
 
-	if (!line || BUFF_SIZE <= 0 || fd < 0 || (rd = read(fd, (char *)0, 0)) < 0)
+	if (fd < 0 || !line || BUFF_SIZE < 1 || read(fd, buff, 0) < 0)
 		return (-1);
-	buff = ft_strnew(BUFF_SIZE);
+	if (!over[fd])
+		if (!(over[fd] = ft_strnew(0)))
+			return (-1);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		nl = ft_check_nl(&overflow[fd], &buff, line);
-		free(buff);
-		if (nl == 1)
+		buff[rd] = '\0';
+		over[fd] = ft_strfjoin(&over[fd], buff);
+		if (fill_line(&over[fd], line) == 1)
 			return (1);
-		buff = ft_strnew(BUFF_SIZE);
 	}
-	if ((nl = ft_check_nl(&overflow[fd], &buff, line)))
+	if (fill_line(&over[fd], line) == 1)
+		return (1);
+	if (over[fd][0])
 	{
-		free(buff);
+		*line = ft_strdup(over[fd]);
+		ft_strdel(&over[fd]);
 		return (1);
 	}
-	else if (ft_strlen(overflow[fd]) > 0)
-		return (ft_last_gnl(&overflow[fd], &buff, line));
-	free(buff);
 	return (0);
 }
